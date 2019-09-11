@@ -3,15 +3,31 @@ import React, { Component } from "react";
 class SearchBar extends Component {
   state = {
     searchText: "",
-    placeholder: "Tapez le titre d'un film... !"
+    placeholder: "Tapez le titre d'un film... !",
+    intervalBeforeRequest: 1000,
+    lockRequest: false
   };
 
   handleChange(e) {
     this.setState({ searchText: e.target.value });
+    if (!this.state.lockRequest) {
+      this.setState({ lockRequest: true });
+      setTimeout(
+        function() {
+          this.search();
+        }.bind(this),
+        this.state.intervalBeforeRequest
+      );
+    }
   }
 
-  handleOnClick(e) {
+  handleOnClick() {
+    this.search();
+  }
+
+  search() {
     this.props.callback(this.state.searchText);
+    this.setState({ lockRequest: false });
   }
 
   render() {
@@ -24,6 +40,7 @@ class SearchBar extends Component {
             onChange={this.handleChange.bind(this)}
             placeholder={this.state.placeholder}
           />
+          {/* 
           <span className="input-group-btn">
             <button
               className="btn btn-secondary"
@@ -32,6 +49,7 @@ class SearchBar extends Component {
               Rechercher
             </button>
           </span>
+          */}
         </div>
       </div>
     );
